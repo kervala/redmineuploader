@@ -30,7 +30,7 @@ bool IsOS64bits()
 {
 	bool res;
 
-#ifdef _WIN644
+#ifdef _WIN64
 	res = true;
 #else
 	res = false;
@@ -46,7 +46,7 @@ bool IsOS64bits()
 
 		if (fnIsWow64Process(GetCurrentProcess(), &bIsWow64))
 		{
-			res = bIsWow64 == TRUE;
+			res = bIsWow64 == FALSE;
 		}
 	}
 #endif

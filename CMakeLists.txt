@@ -13,14 +13,14 @@ IF(NOT COMMON_MODULE_FOUND)
   MESSAGE(FATAL_ERROR "Unable to find common.cmake! Please place it in CMakeModules subdirectory, set CMAKE_MODULE_PATH environement variable or set CMAKE_MODULE_PATH parameter to CMake.")
 ENDIF(NOT COMMON_MODULE_FOUND)
 
-SET(VERSION_MAJOR 0)
-SET(VERSION_MINOR 9)
+SET(VERSION_MAJOR 1)
+SET(VERSION_MINOR 0)
 SET(VERSION_PATCH "REVISION")
 SET(AUTHOR "Kervala")
 SET(PRODUCT "RedmineUpdater")
-SET(DESCRIPTION "deviantART Messaging Network (dAmn) chat client")
+SET(DESCRIPTION "Tool to upload files to Redmine")
 SET(TARGET "redmineupdater")
-SET(YEAR "2013-2015")
+SET(YEAR "2015")
 
 PROJECT(${PRODUCT} C CXX)
 

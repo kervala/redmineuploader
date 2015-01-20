@@ -17,45 +17,48 @@
  *
  */
 
-#ifndef COMMANDLINE_H
-#define COMMANDLINE_H
+#ifndef REDMINE_H
+#define REDMINE_H
 
 class QNetworkAccessManager;
 
-class CommandLine : public QObject
+class Redmine : public QObject
 {
 	Q_OBJECT
 
 public:
-	CommandLine();
-	virtual ~CommandLine();
+	Redmine();
+	virtual ~Redmine();
 
-	bool parseArguments(const QStringList &args);
-	bool processCommand();
+	bool setRootUrl(const QString &root);
+	bool setProject(const QString &project);
+	bool setUsername(const QString &username);
+	bool setPassword(const QString &password);
+	bool setVersion(const QString &version);
+	bool setFilenames(const QStringList &filenames);
+
+	bool upload();
 
 public slots:
 	void onReply(QNetworkReply *reply);
 	void onUploadProgress(qint64 value, qint64 total);
-	void onUploadFinished();
 
 private:
-	bool openConsole();
-	bool closeConsole();
-
 	void printQt(const QString &str);
+	void printQtLine(const QString &str = "");
 
-	void init();
 	bool get(const QString &url);
 	bool post(const QString &url, const QByteArray &data);
 
+	void updateUserAgent();
 	void addUserAgent(QNetworkRequest &req) const;
-	QString getUserAgent();
 
 	bool prepareLogin();
 	bool login();
 	bool prepareUploadFile();
 	bool uploadFile(const QString &filename);
 
+	bool parseError(const QByteArray &content, QString &error);
 	bool parseAuthenticityToken(const QByteArray &content);
 	bool parseVersionId(const QByteArray &content);
 
@@ -65,7 +68,7 @@ private:
 
 	QStringList m_filenames;
 	QString m_userAgent;
-	QString m_baseUrl;
+	QString m_rootUrl;
 	QString m_project;
 	QString m_username;
 	QString m_password;
@@ -73,7 +76,6 @@ private:
 	QString m_version;
 	QString m_versionId;
 	QString m_utf8;
-	bool m_consoleAllocated;
 
 	QNetworkAccessManager *m_manager;
 };

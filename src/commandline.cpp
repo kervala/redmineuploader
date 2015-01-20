@@ -469,5 +469,5 @@ void CommandLine::onUploadProgress(qint64 value, qint64 total)
 void CommandLine::onUploadFinished()
 {
 	printQt("");
-	printQt("Upload done.");
+	printQt(tr("Upload done."));
 }

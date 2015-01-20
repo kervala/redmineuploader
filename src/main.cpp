@@ -45,36 +45,45 @@ int main(int argc, char *argv[])
 	QString locale = QLocale::system().name().left(2);
 
 	// detect directory with translations
-	QString folder;
+	QString localFolder, systemFolder;
 	QDir dir(QCoreApplication::applicationDirPath());
 	
 #if defined(Q_OS_WIN32)
-	folder = dir.absolutePath();
+	localFolder = dir.absolutePath();
+
+	// under Windows, both files are in the same directory
+	systemFolder = localFolder;
 #else
 	dir.cdUp();
 
 #ifdef Q_OS_MAC
-	folder = dir.absolutePath() + "/Resources";
+	localFolder = dir.absolutePath() + "/Resources";
+
+	// under OS X, both files are in the same directory
+	systemFolder = localFolder;
 #elif defined(SHARE_PREFIX)
-	folder = SHARE_PREFIX;
+	localFolder = SHARE_PREFIX;
+	systemFolder = "/usr/share/qt5";
 #else
-	folder = QString("%1/share/%2").arg(dir.absolutePath()).arg(TARGET);
+	localFolder = QString("%1/share/%2").arg(dir.absolutePath()).arg(TARGET);
+	systemFolder = "/usr/share/qt5";
 #endif
 
 #endif
 
-	folder += "/translations";
+	localFolder += "/translations";
+	systemFolder += "/translations";
 
 	// take the whole locale
 	QTranslator localTranslator;
-	if (localTranslator.load(QString("%1_%2").arg(TARGET).arg(locale), folder))
+	if (localTranslator.load(QString("%1_%2").arg(TARGET).arg(locale), localFolder))
 	{
 		app.installTranslator(&localTranslator);
 	}
 
 	// take the whole locale
 	QTranslator qtTranslator;
-	if (qtTranslator.load("qt_" + locale, folder))
+	if (qtTranslator.load("qt_" + locale, systemFolder))
 	{
 		app.installTranslator(&qtTranslator);
 	}

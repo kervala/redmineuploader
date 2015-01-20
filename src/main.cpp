@@ -24,22 +24,6 @@
 	#include "config.h"
 #endif
 
-/*
-#ifdef QT_STATICPLUGIN
-
-#include <QtPlugin>
-
-#ifdef Q_OS_WIN32
-	Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-#endif
-	
-#ifdef Q_OS_MAC
-	Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin)
-#endif
-
-#endif
-*/
-
 #ifdef DEBUG_NEW
 	#define new DEBUG_NEW
 #endif

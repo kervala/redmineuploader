@@ -49,7 +49,7 @@ USE_QT_MODULES(Network)
 
 FILE(GLOB HEADER src/*.h)
 FILE(GLOB SRC src/*.cpp)
-FILE(GLOB RES res/*.qrc res/*.icns res/*.ico)
+FILE(GLOB RES res/*.ico)
 FILE(GLOB TS translations/*.ts)
 
 SET_TARGET_CONSOLE_EXECUTABLE(${TARGET} ${SRC} ${RES} ${HEADER} ${TS})

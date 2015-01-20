@@ -18,7 +18,7 @@
  */
 
 #include "common.h"
-#include "commandline.h"
+#include "redmine.h"
 
 #ifdef HAVE_CONFIG_H
 	#include "config.h"
@@ -34,16 +34,17 @@ int main(int argc, char *argv[])
 	_CrtSetDbgFlag (_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	Q_INIT_RESOURCE(resources);
-
 	QCoreApplication app(argc, argv);
 
+	// set application information
 	QCoreApplication::setApplicationName(PRODUCT);
 	QCoreApplication::setOrganizationName(AUTHOR);
 	QCoreApplication::setApplicationVersion(VERSION);
 
+	// detect system locale
 	QString locale = QLocale::system().name().left(2);
 
+	// detect directory with translations
 	QString folder;
 	QDir dir(QCoreApplication::applicationDirPath());
 	
@@ -78,19 +79,41 @@ int main(int argc, char *argv[])
 		app.installTranslator(&qtTranslator);
 	}
 
-	CommandLine cmd;
+	// define commandline arguments
+	QCommandLineParser parser;
+	parser.setApplicationDescription(DESCRIPTION);
+	parser.addHelpOption();
+	parser.addVersionOption();
+	parser.addPositionalArgument("root", QCoreApplication::translate("main", "Redmine root URL"), QCoreApplication::translate("main", "<root>"));
+	parser.addPositionalArgument("project", QCoreApplication::translate("main", "Redmine project identifier"), QCoreApplication::translate("main", "<project>"));
+	parser.addPositionalArgument("version", QCoreApplication::translate("main", "Project version"), QCoreApplication::translate("main", "<version>"));
+	parser.addPositionalArgument("username", QCoreApplication::translate("main", "Redmine username"), QCoreApplication::translate("main", "<username>"));
+	parser.addPositionalArgument("password", QCoreApplication::translate("main", "Redmine password"), QCoreApplication::translate("main", "<password>"));
+	
+	parser.addPositionalArgument("filenames", QCoreApplication::translate("main", "Files to upload"), QCoreApplication::translate("main", "[filenames...]"));
 
-	QStringList argList = app.arguments();
-	argList.pop_front();
+	// process the actual command line arguments given by the user
+	parser.process(app);
 
-	if (cmd.parseArguments(argList))
+	QStringList args = parser.positionalArguments();
+
+	if (args.size() > 5)
 	{
-		if (cmd.processCommand())
-		{
-			// only memory leaks are from plugins
-			return app.exec();
-		}
+		Redmine redmine;
+		redmine.setRootUrl(args.takeFirst());
+		redmine.setProject(args.takeFirst());
+		redmine.setVersion(args.takeFirst());
+		redmine.setUsername(args.takeFirst());
+		redmine.setPassword(args.takeFirst());
+		redmine.setFilenames(args);
+
+		redmine.upload();
+
+		// only memory leaks are from plugins
+		return QCoreApplication::exec();
 	}
+
+	parser.showHelp();
 
 	return 0;
 }

@@ -78,14 +78,14 @@ int main(int argc, char *argv[])
 	QTranslator localTranslator;
 	if (localTranslator.load(QString("%1_%2").arg(TARGET).arg(locale), localFolder))
 	{
-		app.installTranslator(&localTranslator);
+		QCoreApplication::installTranslator(&localTranslator);
 	}
 
 	// take the whole locale
 	QTranslator qtTranslator;
 	if (qtTranslator.load("qt_" + locale, systemFolder))
 	{
-		app.installTranslator(&qtTranslator);
+		QCoreApplication::installTranslator(&qtTranslator);
 	}
 
 	Redmine redmine;

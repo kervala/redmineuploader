@@ -170,7 +170,7 @@ bool Redmine::loadSettings()
 	m_username = settings.value("username").toString();
 	m_password = settings.value("password").toString();
 
-	return !m_rootUrl.isEmpty() && settings.status() != QSettings::NoError;
+	return !m_rootUrl.isEmpty() && settings.status() == QSettings::NoError;
 }
 
 bool Redmine::saveSettings()
@@ -181,7 +181,7 @@ bool Redmine::saveSettings()
 	settings.setValue("username", m_username);
 	settings.setValue("password", m_password);
 
-	return settings.status() != QSettings::NoError;
+	return settings.status() == QSettings::NoError;
 }
 
 bool Redmine::upload()
@@ -504,6 +504,8 @@ void Redmine::onReply(QNetworkReply *reply)
 				// upload successful
 				if (!m_filenames.isEmpty())
 				{
+					printQtLine();
+
 					// upload next file
 					prepareUploadFile();
 				}

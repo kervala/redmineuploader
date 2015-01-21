@@ -21,7 +21,9 @@
 #include "redmine.h"
 #include "utils.h"
 
-#include <fcntl.h>
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
 
 #ifdef DEBUG_NEW
 	#define new DEBUG_NEW
@@ -41,37 +43,79 @@ Redmine::~Redmine()
 {
 }
 
-bool Redmine::setRootUrl(const QString &root)
+bool Redmine::parseCommandLine(const QCoreApplication &app)
 {
-	m_rootUrl = root;
+	// define commandline arguments
+	QCommandLineParser parser;
+	parser.setApplicationDescription(DESCRIPTION);
+	parser.addHelpOption();
+	parser.addVersionOption();
 
-	return true;
-}
+	// root, username and password are optional because they can be saved in settings file
+	QCommandLineOption rootOption(QStringList() << "r" << "root", tr("Redmine root URL"), tr("<root>"));
+	parser.addOption(rootOption);
 
-bool Redmine::setProject(const QString &project)
-{
-	m_project = project;
+	QCommandLineOption usernameOption(QStringList() << "u" << "username", tr("Redmine username"), tr("<username>"));
+	parser.addOption(usernameOption);
 
-	return true;
-}
+	QCommandLineOption passwordOption(QStringList() << "p" << "password", tr("Redmine password"), tr("<password>"));
+	parser.addOption(passwordOption);
 
-bool Redmine::setUsername(const QString &username)
-{
-	m_username = username;
+	parser.addPositionalArgument("project", tr("Redmine project identifier"), tr("<project>"));
+	parser.addPositionalArgument("version", tr("Project version"), tr("<version>"));
 
-	return true;
-}
+	parser.addPositionalArgument("filenames", tr("Files to upload"), tr("[filenames...]"));
 
-bool Redmine::setPassword(const QString &password)
-{
-	m_password = password;
+	// process the actual command line arguments given by the user
+	parser.process(app);
 
-	return true;
-}
+	if (parser.isSet(rootOption)) m_rootUrl = parser.value(rootOption);
+	if (parser.isSet(usernameOption)) m_username = parser.value(usernameOption);
+	if (parser.isSet(passwordOption)) m_password = parser.value(passwordOption);
 
-bool Redmine::setVersion(const QString &version)
-{
-	m_version = version;
+	bool error = false;
+
+	if (m_rootUrl.isEmpty())
+	{
+		printQtLine(tr("Redmine root URL must be defined in config file or on command-line."));
+
+		error = true;
+	}
+
+	if (m_username.isEmpty())
+	{
+		printQtLine(tr("Redmine username must be defined in config file or on command-line."));
+
+		error = true;
+	}
+
+	if (m_password.isEmpty())
+	{
+		printQtLine(tr("Redmine password must be defined in config file or on command-line."));
+
+		error = true;
+	}
+
+	QStringList args = parser.positionalArguments();
+
+	if (args.size() < 3)
+	{
+		printQtLine(tr("Some arguments are missing on command-line."));
+
+		error = true;
+	}
+
+	if (error)
+	{
+		parser.showHelp();
+
+		return false;
+	}
+
+	m_project = args.takeFirst();
+	m_version = args.takeFirst();
+
+	setFilenames(args);
 
 	return true;
 }

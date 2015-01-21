@@ -88,41 +88,12 @@ int main(int argc, char *argv[])
 		app.installTranslator(&qtTranslator);
 	}
 
-	// define commandline arguments
-	QCommandLineParser parser;
-	parser.setApplicationDescription(DESCRIPTION);
-	parser.addHelpOption();
-	parser.addVersionOption();
-	parser.addPositionalArgument("root", QCoreApplication::translate("main", "Redmine root URL"), QCoreApplication::translate("main", "<root>"));
-	parser.addPositionalArgument("project", QCoreApplication::translate("main", "Redmine project identifier"), QCoreApplication::translate("main", "<project>"));
-	parser.addPositionalArgument("version", QCoreApplication::translate("main", "Project version"), QCoreApplication::translate("main", "<version>"));
-	parser.addPositionalArgument("username", QCoreApplication::translate("main", "Redmine username"), QCoreApplication::translate("main", "<username>"));
-	parser.addPositionalArgument("password", QCoreApplication::translate("main", "Redmine password"), QCoreApplication::translate("main", "<password>"));
+	Redmine redmine;
 	
-	parser.addPositionalArgument("filenames", QCoreApplication::translate("main", "Files to upload"), QCoreApplication::translate("main", "[filenames...]"));
+	if (!redmine.parseCommandLine(app)) return 0;
 
-	// process the actual command line arguments given by the user
-	parser.process(app);
+	redmine.upload();
 
-	QStringList args = parser.positionalArguments();
-
-	if (args.size() > 5)
-	{
-		Redmine redmine;
-		redmine.setRootUrl(args.takeFirst());
-		redmine.setProject(args.takeFirst());
-		redmine.setVersion(args.takeFirst());
-		redmine.setUsername(args.takeFirst());
-		redmine.setPassword(args.takeFirst());
-		redmine.setFilenames(args);
-
-		redmine.upload();
-
-		// only memory leaks are from plugins
-		return QCoreApplication::exec();
-	}
-
-	parser.showHelp();
-
-	return 0;
+	// only memory leaks are from plugins
+	return QCoreApplication::exec();
 }

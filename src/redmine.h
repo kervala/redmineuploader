@@ -30,11 +30,8 @@ public:
 	Redmine();
 	virtual ~Redmine();
 
-	bool setRootUrl(const QString &root);
-	bool setProject(const QString &project);
-	bool setUsername(const QString &username);
-	bool setPassword(const QString &password);
-	bool setVersion(const QString &version);
+	bool parseCommandLine(const QCoreApplication &app);
+
 	bool setFilenames(const QStringList &filenames);
 
 	bool upload();

@@ -364,14 +364,27 @@ bool Redmine::uploadFile(const QString &filename)
 
 bool Redmine::parseError(const QByteArray &content, QString &error)
 {
-	QRegExp reg("<div class=\"flash error\" id=\"flash_error\">([^<]*)</div>");
+	QRegExp reg;
+	
+	reg.setPattern("<div class=\"flash error\" id=\"flash_error\">([^<]*)</div>");
 
-	if (reg.indexIn(content) < 0) return false;
+	if (reg.indexIn(content) > -1)
+	{
+		error = reg.cap(1);
 
 		return true;
 	}
 
-	return true;
+	reg.setPattern("<p id=\"errorExplanation\">([^<]*)</p>");
+
+	if (reg.indexIn(content) > -1)
+	{
+		error = reg.cap(1);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool Redmine::parseAuthenticityToken(const QByteArray &content)
@@ -426,13 +439,17 @@ void Redmine::onReply(QNetworkReply *reply)
 	QString url = reply->url().toString();
 	int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 	QByteArray content = reply->readAll();
-	QString error;
+	QString error = reply->errorString();
+	QNetworkReply::NetworkError errorCode = reply->error();
 
 	// always delete QNetworkReply to avoid memory leaks
 	reply->deleteLater();
+	reply = NULL;
 
-	if (reply->error() == QNetworkReply::NoError)
+	if (errorCode == QNetworkReply::NoError)
 	{
+		error.clear();
+
 		// if status code 302 (redirection), we can clear content
 		if (statusCode == 302) content.clear();
 
@@ -512,10 +529,6 @@ void Redmine::onReply(QNetworkReply *reply)
 				error = tr("Unknown URL: %1 or redirection: %2").arg(url).arg(redirection);
 			}
 		}
-	}
-	else
-	{
-		error = reply->errorString();
 	}
 
 	if (!error.isEmpty())

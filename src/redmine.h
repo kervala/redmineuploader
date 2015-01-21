@@ -34,6 +34,9 @@ public:
 
 	bool setFilenames(const QStringList &filenames);
 
+	bool loadSettings();
+	bool saveSettings();
+
 	bool upload();
 
 public slots:

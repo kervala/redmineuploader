@@ -37,6 +37,11 @@ Redmine::Redmine():m_manager(NULL)
 	connect(m_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onReply(QNetworkReply*)));
 
 	updateUserAgent();
+
+	if (loadSettings())
+	{
+		printQtLine(tr("Settings loaded from file."));
+	}
 }
 
 Redmine::~Redmine()
@@ -155,6 +160,28 @@ bool Redmine::setFilenames(const QStringList &filenames)
 	m_filenames.removeDuplicates();
 
 	return true;
+}
+
+bool Redmine::loadSettings()
+{
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, AUTHOR, PRODUCT);
+
+	m_rootUrl = settings.value("root").toString();
+	m_username = settings.value("username").toString();
+	m_password = settings.value("password").toString();
+
+	return !m_rootUrl.isEmpty() && settings.status() != QSettings::NoError;
+}
+
+bool Redmine::saveSettings()
+{
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, AUTHOR, PRODUCT);
+
+	settings.setValue("root", m_rootUrl);
+	settings.setValue("username", m_username);
+	settings.setValue("password", m_password);
+
+	return settings.status() != QSettings::NoError;
 }
 
 bool Redmine::upload()
@@ -341,7 +368,8 @@ bool Redmine::parseError(const QByteArray &content, QString &error)
 
 	if (reg.indexIn(content) < 0) return false;
 
-	error = reg.cap(1);
+		return true;
+	}
 
 	return true;
 }
@@ -466,6 +494,15 @@ void Redmine::onReply(QNetworkReply *reply)
 				{
 					printQtLine();
 					printQtLine(tr("All files successfully uploaded"));
+
+					if (saveSettings())
+					{
+						printQtLine(tr("Settings saved to file."));
+					}
+					else
+					{
+						printQtLine(tr("Unable to save settings."));
+					}
 
 					QCoreApplication::exit(0);
 				}

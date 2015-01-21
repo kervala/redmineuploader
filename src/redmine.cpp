@@ -297,10 +297,10 @@ bool Redmine::login()
 
 	QUrlQuery params;
 	params.addQueryItem("utf8", m_utf8);
-	params.addQueryItem("authenticity_token", m_authenticityToken);
-	params.addQueryItem("back_url", m_rootUrl);
-	params.addQueryItem("username", m_username);
-	params.addQueryItem("password", m_password);
+	params.addQueryItem("authenticity_token", QUrl::toPercentEncoding(m_authenticityToken));
+	params.addQueryItem("back_url", QUrl::toPercentEncoding(m_rootUrl));
+	params.addQueryItem("username", QUrl::toPercentEncoding(m_username));
+	params.addQueryItem("password", QUrl::toPercentEncoding(m_password));
 
 	return post(getLoginUrl(), params.query().toUtf8());
 }

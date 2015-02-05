@@ -57,13 +57,13 @@ bool Redmine::parseCommandLine(const QCoreApplication &app)
 	parser.addVersionOption();
 
 	// root, username and password are optional because they can be saved in settings file
-	QCommandLineOption rootOption(QStringList() << "r" << "root", tr("Redmine root URL"), tr("<root>"));
+	QCommandLineOption rootOption(QStringList() << "r" << "root", tr("Redmine root URL"));
 	parser.addOption(rootOption);
 
-	QCommandLineOption usernameOption(QStringList() << "u" << "username", tr("Redmine username"), tr("<username>"));
+	QCommandLineOption usernameOption(QStringList() << "u" << "username", tr("Redmine username"));
 	parser.addOption(usernameOption);
 
-	QCommandLineOption passwordOption(QStringList() << "p" << "password", tr("Redmine password"), tr("<password>"));
+	QCommandLineOption passwordOption(QStringList() << "p" << "password", tr("Redmine password"));
 	parser.addOption(passwordOption);
 
 	parser.addPositionalArgument("project", tr("Redmine project identifier"), tr("<project>"));

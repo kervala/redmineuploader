@@ -192,11 +192,13 @@ bool Redmine::upload()
 void Redmine::printQt(const QString &str)
 {
 	fprintf(stdout, "%s", str.toUtf8().data());
+	fflush(stdout);
 }
 
 void Redmine::printQtLine(const QString &str)
 {
 	fprintf(stdout, "%s\n", str.toUtf8().data());
+	fflush(stdout);
 }
 
 void Redmine::addUserAgent(QNetworkRequest &req) const

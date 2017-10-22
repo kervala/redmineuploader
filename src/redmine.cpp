@@ -391,11 +391,11 @@ bool Redmine::parseError(const QByteArray &content, QString &error)
 
 bool Redmine::parseAuthenticityToken(const QByteArray &content)
 {
-	QRegExp reg("authenticity_token\" type=\"hidden\" value=\"([A-Z0-9a-z/=+]{44})\"");
+	QRegExp reg("authenticity_token(.*) value=\"([A-Z0-9a-z/=+]{44,88})\"");
 
 	if (reg.indexIn(content) < 0) return false;
 
-	m_authenticityToken = reg.cap(1);
+	m_authenticityToken = reg.cap(2);
 
 	printQtLine(tr("Found authenticity token %1").arg(m_authenticityToken));
 
@@ -496,7 +496,7 @@ void Redmine::onReply(QNetworkReply *reply)
 		}
 		else
 		{
-			if (url == getLoginUrl() && redirection == m_rootUrl)
+			if (url == getLoginUrl() && (redirection == m_rootUrl || (redirection == m_rootUrl + "/my/page")))
 			{
 				// login successful
 				prepareUploadFile();

@@ -25,7 +25,7 @@ SET(AUTHOR "Kervala")
 SET(PRODUCT "RedmineUploader")
 SET(DESCRIPTION "Tool to upload files to Redmine")
 SET(TARGET "redmineuploader")
-SET(YEAR "2015-2018")
+SET(YEAR "2015-${CURRENT_YEAR}")
 
 PROJECT(${PRODUCT} C CXX)
 

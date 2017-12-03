@@ -29,7 +29,7 @@
 	#define new DEBUG_NEW
 #endif
 
-Redmine::Redmine():m_manager(NULL)
+Redmine::Redmine():m_manager(NULL), m_debug(false)
 {
 	m_utf8 = "&#x2713;";
 	m_manager = new QNetworkAccessManager(this);
@@ -56,6 +56,10 @@ bool Redmine::parseCommandLine(const QCoreApplication &app)
 	parser.addHelpOption();
 	parser.addVersionOption();
 
+	// debug option
+	QCommandLineOption debugOption(QStringList() << "d" << "debug", tr("Debug HTTP operations"));
+	parser.addOption(debugOption);
+
 	// root, username and password are optional because they can be saved in settings file
 	QCommandLineOption rootOption(QStringList() << "r" << "root", tr("Redmine root URL"), tr("url"));
 	parser.addOption(rootOption);
@@ -74,6 +78,7 @@ bool Redmine::parseCommandLine(const QCoreApplication &app)
 	// process the actual command line arguments given by the user
 	parser.process(app);
 
+	if (parser.isSet(debugOption)) m_debug = true;
 	if (parser.isSet(rootOption)) m_rootUrl = parser.value(rootOption);
 	if (parser.isSet(usernameOption)) m_username = parser.value(usernameOption);
 	if (parser.isSet(passwordOption)) m_password = parser.value(passwordOption);
@@ -217,6 +222,8 @@ bool Redmine::get(const QString &url)
 
 	QNetworkReply *reply = m_manager->get(req);
 
+	if (m_debug) printQtLine(QString("HTTP GET request: %1").arg(url));
+
 	return true;
 }
 
@@ -228,6 +235,8 @@ bool Redmine::post(const QString &url, const QByteArray &data)
 	req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
 	QNetworkReply *reply = m_manager->post(req, data);
+
+	if (m_debug) printQtLine(QString("HTTP POST request: %1").arg(url));
 
 	return true;
 }
@@ -443,6 +452,15 @@ void Redmine::onReply(QNetworkReply *reply)
 	QByteArray content = reply->readAll();
 	QString error = reply->errorString();
 	QNetworkReply::NetworkError errorCode = reply->error();
+
+	if (m_debug)
+	{
+		printQtLine(QString("HTTP response: %1").arg(statusCode));
+
+		if (!redirection.isEmpty()) printQtLine(QString("Redirection: %1").arg(redirection));
+
+		printQtLine(QString("URL: %1").arg(url));
+	}
 
 	// always delete QNetworkReply to avoid memory leaks
 	reply->deleteLater();

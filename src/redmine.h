@@ -76,6 +76,7 @@ private:
 	QString m_version;
 	QString m_versionId;
 	QString m_utf8;
+	bool m_debug;
 
 	QNetworkAccessManager *m_manager;
 };

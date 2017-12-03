@@ -473,9 +473,13 @@ void Redmine::onReply(QNetworkReply *reply)
 		// if status code 302 (redirection), we can clear content
 		if (statusCode == 302) content.clear();
 
-		if (!content.isEmpty() && !parseError(content, error))
+		if (!content.isEmpty())
 		{
-			if (url == getLoginUrl())
+			if (parseError(content, error))
+			{
+				// process error later
+			}
+			else if (url == getLoginUrl())
 			{
 				if (parseAuthenticityToken(content))
 				{
@@ -514,6 +518,8 @@ void Redmine::onReply(QNetworkReply *reply)
 		}
 		else
 		{
+			if (m_debug) printQtLine("Empty content");
+
 			if (url == getLoginUrl() && (redirection == m_rootUrl || (redirection == m_rootUrl + "/my/page")))
 			{
 				// login successful

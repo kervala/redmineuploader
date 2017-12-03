@@ -546,16 +546,21 @@ void Redmine::onReply(QNetworkReply *reply)
 					QCoreApplication::exit(0);
 				}
 			}
+			else if (!redirection.isEmpty())
+			{
+				error = tr("Redirection: %1").arg(redirection);
+			}
 			else
 			{
-				error = tr("Unknown URL: %1 or redirection: %2").arg(url).arg(redirection);
+				error = tr("Unknown URL: %1").arg(url);
 			}
 		}
 	}
 
 	if (!error.isEmpty())
 	{
-		printQtLine(tr("Error %1: %2").arg(statusCode).arg(error));
+		printQtLine("");
+		printQtLine(tr("Error %1 (HTTP: %2)").arg(error).arg(statusCode));
 
 		QCoreApplication::exit(1);
 	}

@@ -1,14 +1,24 @@
+@echo off
+
 set UPLOADER="C:\Program Files\RedmineUploader\redmineuploader.exe"
+set COMPILER=vc12
+set UNIXDIR=D:\Projects\packaging\unix
+set CURRENTDIR=%cd%
 
-call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86
+set QTVERSION=5.10.1
 
-set QTDIR=D:/External/vc10/qt-5.4.0-static-32
+cd %UNIXDIR%
+call setenv.bat %COMPILER% amd64
 
-rmdir /s /q package_x32
+cd %CURRENTDIR%
 
-mkdir package_x32
+set QTDIR=%WIN32CROSS_PATH%/%COMPILER%/external/qt-%QTVERSION%-static-64
 
-cd package_x32
+rmdir /s /q package_x64
+
+mkdir package_x64
+
+cd package_x64
 cmake .. -DCMAKE_BUILD_TYPE=Release -G"NMake Makefiles"
 
 nmake package
@@ -19,15 +29,20 @@ cd ..
 
 pause
 
-call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+set QTVERSION=5.6.3
 
-set QTDIR=D:/External/vc10/qt-5.4.0-static-64
+cd %UNIXDIR%
+call setenv.bat %COMPILER% x86
 
-rmdir /s /q package_x64
+cd %CURRENTDIR%
 
-mkdir package_x64
+set QTDIR=%WIN32CROSS_PATH%/%COMPILER%/external/qt-%QTVERSION%-static-32
 
-cd package_x64
+rmdir /s /q package_x32
+
+mkdir package_x32
+
+cd package_x32
 cmake .. -DCMAKE_BUILD_TYPE=Release -G"NMake Makefiles"
 
 nmake package
